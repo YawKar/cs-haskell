@@ -210,3 +210,26 @@ groupElems' (x : xs) =
     (g : gs)
       | x == head g -> (x : g) : gs
       | otherwise -> [x] : g : gs
+
+take' :: Int -> [a] -> [a]
+take' n _ | n <= 0 = []
+take' _ [] = []
+take' n (x : xs) = x : take' (n - 1) xs
+
+drop' :: Int -> [a] -> [a]
+drop' n xs | n <= 0 = xs
+drop' _ [] = []
+drop' n (_ : xs) = drop' (n - 1) xs
+
+splitAt' :: Int -> [a] -> ([a], [a])
+splitAt' n xs = (take' n xs, drop' n xs)
+
+infixl 9 !!!
+(!!!) :: [a] -> Int -> a
+(!!!) xs index | index < 0 = error "Main.!!!: negative index"
+(!!!) [] _ = error "Main.!!!: index too large"
+(!!!) (x : _) 0 = x
+(!!!) (_ : xs) index = xs !!! (index - 1)
+
+fifthElement :: Integer
+fifthElement = [1, 2, 3, 4, 5, 6, 7] !!! 5; -- 6 (0-based indexing)
