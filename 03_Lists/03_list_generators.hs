@@ -83,3 +83,25 @@ instance Enum Odd where
     | otherwise = x0 : enumFromThenTo x1 (Odd (x1val + diff)) x2
     where
       diff = x1val - x0val
+
+xs :: [Integer]
+xs = [1..20]
+
+_first :: [Integer]
+_first = [x ^ 2 | x <- xs]
+
+_secondConditioned :: [Integer]
+_secondConditioned = [x ^ 2 | x <- xs, x ^ 2 < 200]
+
+_complexListComprehension :: [(Integer, Integer)]
+_complexListComprehension = [(x, y) | x <- [1, 2], y <- [1, 2]]
+
+pythagoreanTriples :: [(Integer, Integer, Integer)]
+pythagoreanTriples = [(x, y, z) | x <- xs, y <- xs, z <- xs, x ^ 2 + y ^ 2 == z ^ 2, x <= y] -- 2 conditions
+
+coins :: (Ord a, Num a) => [a]
+coins = [2, 3, 7]
+
+change :: (Ord a, Num a) => a -> [[a]]
+change 0 = [[]]
+change total = concat [map (c:) (change (total - c)) | c <- coins, total >= c]
