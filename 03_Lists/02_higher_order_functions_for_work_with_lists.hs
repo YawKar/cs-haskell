@@ -1,4 +1,4 @@
-import Data.Char (isDigit)
+import Data.Char (isDigit, isUpper)
 import Data.List (partition)
 
 filter' :: (a -> Bool) -> [a] -> [a]
@@ -58,3 +58,52 @@ concatMap' f = concat' . map' f
 
 squares'n'cubes :: Num a => [a] -> [a]
 squares'n'cubes = concatMap (\x -> [x ^ 2, x ^ 3])
+
+perms :: [a] -> [[a]]
+perms [] = [[]]
+perms xs = helperIterate [] xs
+  where
+    helperIterate lhs [] = []
+    helperIterate lhs (h : rhs) = map (h:) (perms $ lhs ++ rhs) ++ helperIterate (h : lhs) rhs -- very slow
+
+perms' :: [a] -> [[a]]
+perms' [] = [[]]
+perms' [x] = [[x]]
+perms' (x : xs) = concatMap (insertElem x) (perms' xs)
+  where
+    insertElem x [] = [[x]]
+    insertElem x ys@(y : yss) = (x : ys) : map (y:) (insertElem x yss) -- pretty fast
+
+and', or' :: [Bool] -> Bool
+and' [] = True
+and' (x : xs) = x && and' xs
+-- and' = foldr (&&) True -- another implementation
+or' [] = False
+or' (x : xs) = x || or' xs
+-- or' = foldr (||) False -- another implementation
+
+all' :: (a -> Bool) -> [a] -> Bool
+all' p = and' . map' p
+
+any' :: (a -> Bool) -> [a] -> Bool
+any' p = or' . map' p
+
+reverseWordsInSentence :: String -> String
+reverseWordsInSentence = unwords . map reverse . words
+
+delAllUpper :: String -> String
+delAllUpper = unwords . filter (not . all isUpper) . words
+
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith' _ [] _ = []
+zipWith' _ _ [] = []
+zipWith' f (a:as) (b:bs) = f a b : zipWith' f as bs
+
+zipThroughZipWith' :: [a] -> [b] -> [(a, b)]
+zipThroughZipWith' = zipWith' (,)
+
+max3 :: Ord a => [a] -> [a] -> [a] -> [a]
+max3 = zipWith3 ((max .) . max)
+
+max3' :: Ord a => a -> a -> a -> a
+max3' = (.) (max .) max
