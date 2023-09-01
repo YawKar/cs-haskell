@@ -130,3 +130,54 @@ parsePerson = setFields . lines
         trim :: String -> String
         trim = f . f
             where f = reverse . dropWhile isSpace
+
+{-
+ghci> :k Int
+Int :: *
+ghci> :k Maybe
+Maybe :: * -> *
+ghci> :k Maybe Int
+Maybe Int :: *
+ghci> :k Either
+Either :: * -> * -> *
+ghci> :k Either Int String
+Either Int String :: *
+ghci> :k []
+[] :: * -> *
+ghci> :k [Int]
+[Int] :: *
+ghci> :k (,)
+(,) :: * -> * -> *
+ghci> :k (,,)
+(,,) :: * -> * -> * -> *
+
+only * kinds have values that inhabit them
+-}
+
+eitherToMaybe :: Either a b -> Maybe a
+eitherToMaybe (Left a) = Just a
+eitherToMaybe (Right _) = Nothing
+
+{-
+We can force strict evaluation of values under parametric types on the data constructor level
+-}
+
+data CoordLazy a = CoordLazy a a
+    deriving Show
+
+data CoordStrict a = CoordStrict !a !a
+    deriving Show
+
+getXLazy :: CoordLazy a -> a
+getXLazy (CoordLazy x _) = x
+is3 = getXLazy (CoordLazy 3 undefined)
+
+getXStrict :: CoordStrict a -> a
+getXStrict (CoordStrict x _) = x
+isDivergentCalculation = getXStrict (CoordStrict 3 undefined)
+
+{-
+Convention: any infix data constructor should begin with ':' (an equvivalent of a Big Letter)
+data Complex a = !a :+ !a
+data Ratio a = !a :% !a
+-}
