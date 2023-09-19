@@ -114,14 +114,17 @@ data Tree a
 numberTree :: Tree () -> Tree Integer
 numberTree tree = evalState (monadicNumbering tree) 1
 
+tick :: State Integer Integer
+tick = do
+    n <- get
+    put (n + 1)
+    return n
+
 monadicNumbering :: Tree () -> State Integer (Tree Integer)
 monadicNumbering (Leaf _) = do
-    n <- get
-    put (n + 1)
-    return (Leaf n)
+    Leaf <$> tick
 monadicNumbering (Fork left val right) = do
     left' <- monadicNumbering left
-    n <- get
-    put (n + 1)
+    n <- tick
     right' <- monadicNumbering right
     return (Fork left' n right')
