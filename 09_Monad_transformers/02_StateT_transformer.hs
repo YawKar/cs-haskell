@@ -163,19 +163,22 @@ data Tree a
   | Fork (Tree a) a (Tree a)
   deriving (Show)
 
+tick :: StateT Integer (Writer (Sum Integer)) Integer
+tick = do
+  n <- get
+  put (n + 1)
+  return n
+
 numberAndCount :: Tree () -> (Tree Integer, Integer)
 numberAndCount t = getSum <$> runWriter (evalStateT (go t) 1)
   where
     go :: Tree () -> StateT Integer (Writer (Sum Integer)) (Tree Integer)
     go (Leaf x) = do
       lift $ tell 1
-      n <- get
-      put (n + 1)
-      return (Leaf n)
+      Leaf <$> tick
     go (Fork left _ right) = do
       left' <- go left
-      n <- get
-      put (n + 1)
+      n <- tick
       right' <- go right
       return (Fork left' n right')
 
